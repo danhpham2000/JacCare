@@ -1,0 +1,35 @@
+[MASTER]
+ignore=.venv,node_modules,frontend
+init-hook='import sys; sys.path.extend([".", "./backend"])'
+
+[MESSAGES CONTROL]
+disable=
+    missing-module-docstring,
+    missing-function-docstring,
+    missing-class-docstring,
+    too-many-arguments,
+    too-many-positional-arguments,
+    too-many-locals,
+    too-many-branches,
+    too-many-return-statements,
+    broad-exception-caught,
+    duplicate-code,
+    too-few-public-methods,
+    wrong-import-position,
+    wrong-import-order,
+    redefined-outer-name,
+    trailing-newlines,
+    global-statement,
+    unused-import
+
+[FORMAT]
+max-line-length=300
+
+[TYPECHECK]
+ignored-modules=fastapi,pydantic,dotenv,neo4j
+
+[DESIGN]
+max-args=8
+max-locals=25
+max-branches=20
+max-returns=12
