@@ -1,0 +1,57 @@
+[
+  {
+    "id": "service_001",
+    "name": "CHIP Application Assistance",
+    "category": "health insurance",
+    "description": "Helps families apply for children's health insurance support.",
+    "eligibility": "Families with children and limited income may qualify.",
+    "documents_required": ["Proof of income", "Child identification", "Proof of residence if available"],
+    "languages": ["English", "Spanish", "Vietnamese"],
+    "phone": "555-333-4444",
+    "website": "https://example.org/chip-help"
+  },
+  {
+    "id": "service_002",
+    "name": "Transit Voucher Program",
+    "category": "transportation",
+    "description": "Provides bus passes or ride vouchers for medical appointments.",
+    "eligibility": "Low-income residents without reliable transportation may qualify.",
+    "documents_required": ["Appointment details", "Proof of residence if available"],
+    "languages": ["English", "Spanish"],
+    "phone": "555-333-5555",
+    "website": "https://example.org/transit-vouchers"
+  },
+  {
+    "id": "service_003",
+    "name": "Food Support Office",
+    "category": "food support",
+    "description": "Connects families to SNAP screening and local food pantries.",
+    "eligibility": "Households with limited income may qualify.",
+    "documents_required": ["Household size", "Income information if available"],
+    "languages": ["English", "Spanish", "Vietnamese"],
+    "phone": "555-333-6666",
+    "website": "https://example.org/food-support"
+  },
+  {
+    "id": "service_004",
+    "name": "Prescription Assistance Desk",
+    "category": "prescription assistance",
+    "description": "Screens users for manufacturer assistance, generics, and pharmacy discount cards.",
+    "eligibility": "Uninsured or underinsured residents may qualify.",
+    "documents_required": ["Prescription name", "Income information if available"],
+    "languages": ["English", "Spanish"],
+    "phone": "555-333-7777",
+    "website": "https://example.org/rx-assistance"
+  },
+  {
+    "id": "service_005",
+    "name": "Immigrant Family Resource Center",
+    "category": "clinic navigation",
+    "description": "Helps immigrant families find language-accessible clinics and public services.",
+    "eligibility": "Open to immigrant families and residents seeking multilingual navigation help.",
+    "documents_required": ["No immigration documents required for navigation services"],
+    "languages": ["English", "Spanish", "Vietnamese"],
+    "phone": "555-333-8888",
+    "website": "https://example.org/immigrant-resource"
+  }
+]

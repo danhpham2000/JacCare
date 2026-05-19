@@ -1,0 +1,61 @@
+export const COVERAGE_OPTIONS = [
+  { value: "uninsured", label: "Uninsured" },
+  { value: "medicaid", label: "Medicaid" },
+  { value: "chip", label: "CHIP" },
+  { value: "medicare", label: "Medicare" },
+  { value: "aca_marketplace", label: "ACA marketplace" },
+  { value: "employer_plan", label: "Employer plan" },
+  { value: "underinsured", label: "Underinsured" },
+  { value: "tricare", label: "TRICARE" },
+  { value: "va", label: "VA / Community Care" },
+] as const;
+
+export const INSURANCE_PROVIDERS: Record<string, string[]> = {
+  uninsured: ["No active coverage"],
+  medicaid: [
+    "Medicaid",
+    "Aetna Better Health",
+    "Molina Healthcare",
+    "UnitedHealthcare Community Plan",
+    "Wellpoint",
+  ],
+  chip: [
+    "CHIP",
+    "Aetna Better Health",
+    "Molina Healthcare",
+    "UnitedHealthcare Community Plan",
+    "Wellpoint",
+  ],
+  medicare: [
+    "Original Medicare",
+    "Aetna Medicare",
+    "Humana Medicare",
+    "UnitedHealthcare Medicare Advantage",
+    "Blue Cross Blue Shield Medicare",
+  ],
+  aca_marketplace: [
+    "Ambetter",
+    "Blue Cross Blue Shield",
+    "Molina Healthcare",
+    "Oscar Health",
+    "Cigna Healthcare",
+  ],
+  employer_plan: [
+    "UnitedHealthcare",
+    "Blue Cross Blue Shield",
+    "Aetna",
+    "Cigna Healthcare",
+    "Humana",
+    "Kaiser Permanente",
+  ],
+  underinsured: [
+    "UnitedHealthcare",
+    "Blue Cross Blue Shield",
+    "Aetna",
+    "Cigna Healthcare",
+    "Humana",
+    "Kaiser Permanente",
+  ],
+  tricare: ["TRICARE East", "TRICARE West", "TRICARE For Life"],
+  va: ["VA Health", "VA Community Care"],
+};

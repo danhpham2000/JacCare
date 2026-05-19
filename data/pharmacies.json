@@ -1,0 +1,57 @@
+[
+  {
+    "id": "pharmacy_001",
+    "name": "Austin Generic Savings Pharmacy",
+    "address": "1515 Guadalupe St, Austin, TX",
+    "zip_code": "78705",
+    "discount_available": true,
+    "generic_support": true,
+    "languages": ["English", "Spanish"],
+    "phone": "555-909-1000",
+    "website": "https://example.org/generic-savings"
+  },
+  {
+    "id": "pharmacy_002",
+    "name": "Eastside Community Rx",
+    "address": "901 E Cesar Chavez St, Austin, TX",
+    "zip_code": "78702",
+    "discount_available": true,
+    "generic_support": true,
+    "languages": ["English", "Spanish", "Vietnamese"],
+    "phone": "555-909-2000",
+    "website": "https://example.org/eastside-rx"
+  },
+  {
+    "id": "pharmacy_003",
+    "name": "North Loop Discount Drug",
+    "address": "5310 Airport Blvd, Austin, TX",
+    "zip_code": "78752",
+    "discount_available": true,
+    "generic_support": true,
+    "languages": ["English", "Vietnamese"],
+    "phone": "555-909-3000",
+    "website": "https://example.org/north-rx"
+  },
+  {
+    "id": "pharmacy_004",
+    "name": "Riverside Family Pharmacy",
+    "address": "1901 E Riverside Dr, Austin, TX",
+    "zip_code": "78741",
+    "discount_available": true,
+    "generic_support": false,
+    "languages": ["English", "Spanish"],
+    "phone": "555-909-4000",
+    "website": "https://example.org/riverside-rx"
+  },
+  {
+    "id": "pharmacy_005",
+    "name": "Mail-Order Low Cost Meds",
+    "address": "Remote, Austin, TX",
+    "zip_code": "78705",
+    "discount_available": true,
+    "generic_support": true,
+    "languages": ["English", "Spanish", "Vietnamese"],
+    "phone": "555-909-5000",
+    "website": "https://example.org/mail-order-rx"
+  }
+]

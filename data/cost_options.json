@@ -1,0 +1,12 @@
+[
+  {"resource_name": "Community Health Access Clinic", "cost_type": "sliding_scale_visit", "estimated_min": 25, "estimated_max": 60, "discount_available": true, "payment_plan_available": true},
+  {"resource_name": "Eastside Family Care", "cost_type": "sliding_scale_visit", "estimated_min": 40, "estimated_max": 90, "discount_available": true, "payment_plan_available": true},
+  {"resource_name": "North Loop Community Clinic", "cost_type": "sliding_scale_visit", "estimated_min": 30, "estimated_max": 75, "discount_available": true, "payment_plan_available": true},
+  {"resource_name": "South Austin Low-Cost Urgent Care", "cost_type": "urgent_care_cash_pay", "estimated_min": 95, "estimated_max": 180, "discount_available": false, "payment_plan_available": true},
+  {"resource_name": "Riverside Student Health Bridge", "cost_type": "student_low_cost_visit", "estimated_min": 20, "estimated_max": 70, "discount_available": true, "payment_plan_available": true},
+  {"resource_name": "Central Dental Relief Clinic", "cost_type": "dental_sliding_scale", "estimated_min": 35, "estimated_max": 120, "discount_available": true, "payment_plan_available": true},
+  {"resource_name": "Hope Mental Health Walk-In", "cost_type": "behavioral_health_grant", "estimated_min": 0, "estimated_max": 45, "discount_available": true, "payment_plan_available": false},
+  {"resource_name": "North Austin Pediatric Access", "cost_type": "pediatric_sliding_scale", "estimated_min": 20, "estimated_max": 55, "discount_available": true, "payment_plan_available": true},
+  {"resource_name": "Manor Road Women's Health Co-op", "cost_type": "prenatal_sliding_scale", "estimated_min": 30, "estimated_max": 85, "discount_available": true, "payment_plan_available": true},
+  {"resource_name": "Telehealth Community Triage Line", "cost_type": "telehealth_cash_pay", "estimated_min": 15, "estimated_max": 45, "discount_available": true, "payment_plan_available": false}
+]

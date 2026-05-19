@@ -1,0 +1,62 @@
+[
+  {
+    "id": "route_001",
+    "name": "Bus Route 7",
+    "mode": "public_transit",
+    "type": "bus",
+    "clinic_ids": ["clinic_001", "clinic_008"],
+    "estimated_time": "18 minutes",
+    "estimated_minutes": 18,
+    "estimated_cost": 1.25,
+    "accessibility": "Wheelchair accessible",
+    "route_summary": "Board Route 7 near UT, ride north, exit within 2 blocks of the clinic."
+  },
+  {
+    "id": "route_002",
+    "name": "Bus Route 4 Eastside",
+    "mode": "public_transit",
+    "type": "bus",
+    "clinic_ids": ["clinic_002", "clinic_007"],
+    "estimated_time": "22 minutes",
+    "estimated_minutes": 22,
+    "estimated_cost": 1.25,
+    "accessibility": "Wheelchair accessible",
+    "route_summary": "Ride eastbound to Chicon, then walk 5 minutes."
+  },
+  {
+    "id": "route_003",
+    "name": "Community Ride Voucher",
+    "mode": "no_car",
+    "type": "voucher",
+    "clinic_ids": ["clinic_003", "clinic_004", "clinic_009"],
+    "estimated_time": "25-40 minutes",
+    "estimated_minutes": 30,
+    "estimated_cost": 0,
+    "accessibility": "Limited wheelchair accessible vehicles",
+    "route_summary": "Call voucher office before appointment to request a ride."
+  },
+  {
+    "id": "route_004",
+    "name": "MetroRapid 801",
+    "mode": "public_transit",
+    "type": "bus",
+    "clinic_ids": ["clinic_005", "clinic_006"],
+    "estimated_time": "16 minutes",
+    "estimated_minutes": 16,
+    "estimated_cost": 1.25,
+    "accessibility": "Wheelchair accessible",
+    "route_summary": "Take MetroRapid 801 south and exit at Riverside or downtown."
+  },
+  {
+    "id": "route_005",
+    "name": "Telehealth Phone Visit",
+    "mode": "phone",
+    "type": "telehealth",
+    "clinic_ids": ["clinic_010"],
+    "estimated_time": "Same day callback",
+    "estimated_minutes": 0,
+    "estimated_cost": 0,
+    "accessibility": "Phone or internet access required",
+    "route_summary": "Call the triage line and request a same-day phone visit."
+  }
+]

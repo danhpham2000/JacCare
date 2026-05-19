@@ -1,0 +1,12 @@
+[
+  {"program_name": "CHIP Application Assistance", "income_required": "limited income", "insurance_required": "uninsured child", "household_required": "family with child", "documents_required": ["Proof of income", "Child identification"]},
+  {"program_name": "Transit Voucher Program", "income_required": "limited income", "insurance_required": "any", "household_required": "no car or mobility barrier", "documents_required": ["Appointment details"]},
+  {"program_name": "Food Support Office", "income_required": "limited income", "insurance_required": "any", "household_required": "any household", "documents_required": ["Household size", "Income information"]},
+  {"program_name": "Prescription Assistance Desk", "income_required": "limited income", "insurance_required": "uninsured or underinsured", "household_required": "any", "documents_required": ["Prescription name"]},
+  {"program_name": "Immigrant Family Resource Center", "income_required": "none", "insurance_required": "any", "household_required": "immigrant family", "documents_required": ["None required"]},
+  {"program_name": "Sliding Scale Clinic Enrollment", "income_required": "income self-attestation accepted", "insurance_required": "uninsured", "household_required": "any", "documents_required": ["Proof of income if available"]},
+  {"program_name": "Medicaid Screening Desk", "income_required": "limited income", "insurance_required": "uninsured", "household_required": "elderly, disabled, pregnant, or child", "documents_required": ["ID", "Income information"]},
+  {"program_name": "Student Health Navigation", "income_required": "student budget", "insurance_required": "uninsured or underinsured", "household_required": "student", "documents_required": ["Student ID if available"]},
+  {"program_name": "Mental Health Hotline Referral", "income_required": "none", "insurance_required": "any", "household_required": "any", "documents_required": ["No documents required"]},
+  {"program_name": "Dental Relief Waitlist", "income_required": "limited income", "insurance_required": "uninsured or medicaid", "household_required": "any", "documents_required": ["Photo ID if available"]}
+]
