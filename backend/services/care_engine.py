@@ -230,7 +230,7 @@ def safety_check(payload: dict[str, Any]) -> dict[str, Any]:
                 "safety_level": "emergency",
                 "red_flags": [phrase],
                 "message": message
-                + " Call 911 or go to the nearest emergency department. CareRoute AI is not a medical provider.",
+                + " Call 911 or go to the nearest emergency department. JacCareRoute is not a medical provider.",
                 "continue_matching": True,
             }
     if any(term in text for term in ["infant fever", "baby fever", "high fever", "same-day", "today"]):
@@ -346,7 +346,7 @@ def insurance_verification_message(profile: dict[str, Any], clinic: Optional[dic
     if status in {"medicare", "aca_marketplace", "employer_plan", "underinsured", "tricare", "va"}:
         return {
             "status": "network_check_needed",
-            "message": f"CareRoute cannot confirm network status for {provider_label}. Call {clinic['name']} and verify participation before the visit.",
+            "message": f"JacCareRoute cannot confirm network status for {provider_label}. Call {clinic['name']} and verify participation before the visit.",
             "member_id_check": member_check,
         }
 
@@ -597,19 +597,19 @@ def localized_steps(route: Optional[dict[str, Any]], pharmacy: Optional[dict[str
 def localized_disclaimer(language: str) -> str:
     key = language_key(language)
     if key == "spanish":
-        return "CareRoute AI es una herramienta de navegacion, no un proveedor medico. Los costos y la elegibilidad son estimaciones; llame directamente para confirmar."
+        return "JacCareRoute es una herramienta de navegacion, no un proveedor medico. Los costos y la elegibilidad son estimaciones; llame directamente para confirmar."
     if key == "vietnamese":
-        return "CareRoute AI la cong cu huong dan, khong phai nha cung cap y te. Chi phi va dieu kien duoc tinh chi la uoc tinh; hay lien he truc tiep de xac nhan."
-    return "CareRoute AI is a navigation tool, not a medical provider. Costs and eligibility are estimates; call programs directly to confirm."
+        return "JacCareRoute la cong cu huong dan, khong phai nha cung cap y te. Chi phi va dieu kien duoc tinh chi la uoc tinh; hay lien he truc tiep de xac nhan."
+    return "JacCareRoute is a navigation tool, not a medical provider. Costs and eligibility are estimates; call programs directly to confirm."
 
 
 def localized_safety(safety: dict[str, Any], language: str) -> str:
     key = language_key(language)
     if safety["safety_level"] == "emergency":
         if key == "spanish":
-            return "Se detectaron senales de emergencia. Llame al 911 o vaya al departamento de emergencias mas cercano. CareRoute AI no es un proveedor medico."
+            return "Se detectaron senales de emergencia. Llame al 911 o vaya al departamento de emergencias mas cercano. JacCareRoute no es un proveedor medico."
         if key == "vietnamese":
-            return "Da phat hien dau hieu cap cuu. Hay goi 911 hoac den khoa cap cuu gan nhat. CareRoute AI khong phai la nha cung cap y te."
+            return "Da phat hien dau hieu cap cuu. Hay goi 911 hoac den khoa cap cuu gan nhat. JacCareRoute khong phai la nha cung cap y te."
     if safety["safety_level"] == "urgent_care_recommended":
         if key == "spanish":
             return "No se detectaron senales de emergencia, pero puede ser apropiada atencion profesional el mismo dia. Esto no reemplaza el consejo medico."

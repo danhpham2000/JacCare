@@ -85,7 +85,7 @@ class SessionResponse(BaseModel):
 
 
 app = FastAPI(
-    title="CareRoute AI",
+    title="JacCareRoute",
     description="Healthcare access navigator",
     version="0.2.0",
 )

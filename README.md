@@ -1,8 +1,8 @@
-# CareRoute AI
+# JacCareRoute
 
-CareRoute AI is a Jac-backed healthcare and city-service navigator for uninsured or low-income users. It matches a user’s ZIP code, budget, transportation access, language, care need, urgency, and household context against a graph of clinics, pharmacies, transit routes, cost options, and public assistance programs.
+JacCareRoute is a Jac-backed healthcare and city-service navigator for uninsured or low-income users. It matches a user’s ZIP code, budget, transportation access, language, care need, urgency, and household context against a graph of clinics, pharmacies, transit routes, cost options, and public assistance programs.
 
-CareRoute AI is not an AI doctor. It is a care-access planner that helps answer: where to go, what it may cost, how to get there, what to bring, what support programs may help, and what to say when calling.
+JacCareRoute is not an AI doctor. It is a care-access planner that helps answer: where to go, what it may cost, how to get there, what to bring, what support programs may help, and what to say when calling.
 
 ## What Is Built
 
@@ -95,4 +95,4 @@ npm run build
 
 ## Safety
 
-CareRoute AI avoids diagnosis and treatment advice. It uses deterministic checks for red-flag terms such as trouble breathing, chest pain, severe allergic reaction, loss of consciousness, severe bleeding, stroke symptoms, severe dehydration, infant fever concerns, and self-harm risk. Any eligibility, cost, or availability result is framed as an estimate that should be confirmed directly with the clinic or program office.
+JacCareRoute avoids diagnosis and treatment advice. It uses deterministic checks for red-flag terms such as trouble breathing, chest pain, severe allergic reaction, loss of consciousness, severe bleeding, stroke symptoms, severe dehydration, infant fever concerns, and self-harm risk. Any eligibility, cost, or availability result is framed as an estimate that should be confirmed directly with the clinic or program office.

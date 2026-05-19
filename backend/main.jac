@@ -1,4 +1,4 @@
-"""CareRoute AI Jac backend.
+"""JacCareRoute Jac backend.
 
 Run from this directory with:
     jac run main.jac

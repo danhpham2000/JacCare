@@ -1,1 +1,1 @@
-"""CareRoute backend package."""
+"""JacCareRoute backend package."""

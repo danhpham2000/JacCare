@@ -187,7 +187,7 @@ export default function App() {
     return (
       <main className="flex min-h-screen items-center justify-center px-6">
         <div className="rounded-full border border-[#D8C9B7] bg-white/90 px-5 py-3 text-sm text-slate-700 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
-          Loading CareRoute...
+          Loading JacCareRoute...
         </div>
       </main>
     );
@@ -286,7 +286,7 @@ export default function App() {
       <header className="border-b border-white/60 bg-white/76 backdrop-blur">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-4">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#B85C38]">CareRoute</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#B85C38]">JacCareRoute</p>
             <h1 className="mt-1 text-2xl font-semibold text-slate-950">Welcome back, {user.full_name}</h1>
           </div>
           <div className="flex flex-wrap items-center gap-3">
