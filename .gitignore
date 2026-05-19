@@ -10,3 +10,4 @@ frontend/dist/
 frontend/tsconfig.tsbuildinfo
 backend/careroute.db
 *.log
+.vercel

@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any, Optional
 import json
 import os
+import sys
 
 from fastapi import Depends, FastAPI, Header, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,6 +13,14 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 import sqlite3
 from dotenv import load_dotenv
+
+BASE_DIR = Path(__file__).resolve().parents[1]
+BACKEND_DIR = Path(__file__).resolve().parent
+FRONTEND_DIST = BASE_DIR / "frontend" / "dist"
+FRONTEND_ASSETS = FRONTEND_DIST / "assets"
+
+if str(BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(BACKEND_DIR))
 
 from services.auth_store import (
     create_session,
@@ -36,11 +45,6 @@ from services.care_engine import (
 )
 from services.firecrawl_service import search_live_eligibility
 from services.neo4j_store import graph_store
-
-
-BASE_DIR = Path(__file__).resolve().parents[1]
-FRONTEND_DIST = BASE_DIR / "frontend" / "dist"
-FRONTEND_ASSETS = FRONTEND_DIST / "assets"
 
 load_dotenv(BASE_DIR / ".env")
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 import base64
@@ -9,18 +10,63 @@ import os
 import secrets
 import sqlite3
 
+from dotenv import load_dotenv
+from neo4j import GraphDatabase
+
 
 BASE_DIR = Path(__file__).resolve().parents[2]
-DB_PATH = BASE_DIR / "backend" / "careroute.db"
+load_dotenv(BASE_DIR / ".env")
+
+DB_PATH = Path(os.getenv("CAREROUTE_DB_PATH", str(BASE_DIR / "backend" / "careroute.db")))
+AUTH_STORE = os.getenv("AUTH_STORE", "sqlite").strip().lower()
+
+_AUTH_DRIVER = None
+
+
+def using_neo4j() -> bool:
+    return AUTH_STORE == "neo4j" and bool(os.getenv("NEO4J_URI") and os.getenv("NEO4J_USERNAME") and os.getenv("NEO4J_PASSWORD"))
+
+
+def auth_driver():
+    global _AUTH_DRIVER
+    if not using_neo4j():
+        return None
+    if _AUTH_DRIVER is None:
+        _AUTH_DRIVER = GraphDatabase.driver(
+            os.getenv("NEO4J_URI"),
+            auth=(os.getenv("NEO4J_USERNAME"), os.getenv("NEO4J_PASSWORD")),
+        )
+    return _AUTH_DRIVER
+
+
+def auth_database() -> Optional[str]:
+    return os.getenv("NEO4J_DATABASE") or None
+
+
+def now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
 
 
 def connect() -> sqlite3.Connection:
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
 
 def init_db() -> None:
+    if using_neo4j():
+        driver = auth_driver()
+        if driver is None:
+            return
+        with driver.session(database=auth_database()) as session:
+            session.run("CREATE CONSTRAINT auth_user_id IF NOT EXISTS FOR (u:AuthUser) REQUIRE u.id IS UNIQUE")
+            session.run("CREATE CONSTRAINT auth_user_email IF NOT EXISTS FOR (u:AuthUser) REQUIRE u.email IS UNIQUE")
+            session.run("CREATE CONSTRAINT auth_session_token IF NOT EXISTS FOR (s:AuthSession) REQUIRE s.token IS UNIQUE")
+            session.run("CREATE CONSTRAINT auth_profile_user_id IF NOT EXISTS FOR (p:AuthProfile) REQUIRE p.user_id IS UNIQUE")
+            session.run("CREATE CONSTRAINT auth_route_run_id IF NOT EXISTS FOR (r:AuthRouteRun) REQUIRE r.id IS UNIQUE")
+        return
+
     with connect() as conn:
         conn.executescript(
             """
@@ -65,10 +111,7 @@ def init_db() -> None:
             );
             """
         )
-        existing_columns = {
-            row["name"]
-            for row in conn.execute("PRAGMA table_info(profiles)").fetchall()
-        }
+        existing_columns = {row["name"] for row in conn.execute("PRAGMA table_info(profiles)").fetchall()}
         for column_name, column_sql in [
             ("insurance_provider", "TEXT NOT NULL DEFAULT ''"),
             ("insurance_plan", "TEXT NOT NULL DEFAULT ''"),
@@ -96,9 +139,42 @@ def serialize_row(row: Optional[sqlite3.Row]) -> Optional[dict[str, Any]]:
     return dict(row) if row else None
 
 
+def default_profile() -> dict[str, Any]:
+    return {
+        "zip_code": "",
+        "insurance_status": "uninsured",
+        "insurance_provider": "",
+        "insurance_plan": "",
+        "member_id": "",
+        "budget": 50,
+        "language": "English",
+        "transport_mode": "public_transit",
+        "care_need": "",
+        "urgency": "today",
+        "household": "",
+    }
+
+
 def create_user(full_name: str, email: str, password: str) -> dict[str, Any]:
     password_hash = hash_password(password)
     normalized_email = email.strip().lower()
+
+    if using_neo4j():
+        driver = auth_driver()
+        assert driver is not None
+        with driver.session(database=auth_database()) as session:
+            existing = session.run("MATCH (u:AuthUser {email: $email}) RETURN u.id AS id", email=normalized_email).single()
+            if existing:
+                raise sqlite3.IntegrityError("duplicate email")
+
+            row = session.execute_write(
+                _create_user_neo4j,
+                full_name.strip(),
+                normalized_email,
+                password_hash,
+            )
+        return row
+
     with connect() as conn:
         cursor = conn.execute(
             "INSERT INTO users (full_name, email, password_hash) VALUES (?, ?, ?)",
@@ -119,35 +195,122 @@ def create_user(full_name: str, email: str, password: str) -> dict[str, Any]:
     return dict(row)
 
 
+def _create_user_neo4j(tx, full_name: str, email: str, password_hash: str) -> dict[str, Any]:
+    next_id = tx.run("MATCH (u:AuthUser) RETURN coalesce(max(u.id), 0) + 1 AS next_id").single()["next_id"]
+    created_at = now_iso()
+    tx.run(
+        """
+        CREATE (u:AuthUser {
+            id: $id,
+            full_name: $full_name,
+            email: $email,
+            password_hash: $password_hash,
+            created_at: $created_at
+        })
+        CREATE (p:AuthProfile {
+            user_id: $id,
+            zip_code: '',
+            insurance_status: 'uninsured',
+            insurance_provider: '',
+            insurance_plan: '',
+            member_id: '',
+            budget: 50,
+            language: 'English',
+            transport_mode: 'public_transit',
+            care_need: '',
+            urgency: 'today',
+            household: ''
+        })
+        MERGE (u)-[:HAS_PROFILE]->(p)
+        """,
+        id=int(next_id),
+        full_name=full_name,
+        email=email,
+        password_hash=password_hash,
+        created_at=created_at,
+    )
+    return {"id": int(next_id), "full_name": full_name, "email": email, "created_at": created_at}
+
+
 def authenticate_user(email: str, password: str) -> Optional[dict[str, Any]]:
     normalized_email = email.strip().lower()
+
+    if using_neo4j():
+        driver = auth_driver()
+        assert driver is not None
+        with driver.session(database=auth_database()) as session:
+            row = session.run(
+                """
+                MATCH (u:AuthUser {email: $email})
+                RETURN u.id AS id, u.full_name AS full_name, u.email AS email, u.created_at AS created_at, u.password_hash AS password_hash
+                """,
+                email=normalized_email,
+            ).single()
+        if not row:
+            return None
+        data = row.data()
+        if not verify_password(password, data["password_hash"]):
+            return None
+        return {key: data[key] for key in ["id", "full_name", "email", "created_at"]}
+
     with connect() as conn:
         row = conn.execute("SELECT * FROM users WHERE email = ?", (normalized_email,)).fetchone()
     if not row:
         return None
     if not verify_password(password, row["password_hash"]):
         return None
-    return {
-        "id": row["id"],
-        "full_name": row["full_name"],
-        "email": row["email"],
-        "created_at": row["created_at"],
-    }
+    return {"id": row["id"], "full_name": row["full_name"], "email": row["email"], "created_at": row["created_at"]}
 
 
 def create_session(user_id: int) -> str:
     token = secrets.token_urlsafe(32)
+
+    if using_neo4j():
+        driver = auth_driver()
+        assert driver is not None
+        with driver.session(database=auth_database()) as session:
+            session.run(
+                """
+                CREATE (s:AuthSession {token: $token, user_id: $user_id, created_at: $created_at})
+                """,
+                token=token,
+                user_id=int(user_id),
+                created_at=now_iso(),
+            )
+        return token
+
     with connect() as conn:
         conn.execute("INSERT INTO sessions (token, user_id) VALUES (?, ?)", (token, user_id))
     return token
 
 
 def delete_session(token: str) -> None:
+    if using_neo4j():
+        driver = auth_driver()
+        assert driver is not None
+        with driver.session(database=auth_database()) as session:
+            session.run("MATCH (s:AuthSession {token: $token}) DETACH DELETE s", token=token)
+        return
+
     with connect() as conn:
         conn.execute("DELETE FROM sessions WHERE token = ?", (token,))
 
 
 def user_for_token(token: str) -> Optional[dict[str, Any]]:
+    if using_neo4j():
+        driver = auth_driver()
+        assert driver is not None
+        with driver.session(database=auth_database()) as session:
+            row = session.run(
+                """
+                MATCH (s:AuthSession {token: $token})
+                MATCH (u:AuthUser {id: s.user_id})
+                RETURN u.id AS id, u.full_name AS full_name, u.email AS email, u.created_at AS created_at
+                """,
+                token=token,
+            ).single()
+        return row.data() if row else None
+
     with connect() as conn:
         row = conn.execute(
             """
@@ -162,6 +325,29 @@ def user_for_token(token: str) -> Optional[dict[str, Any]]:
 
 
 def get_profile(user_id: int) -> dict[str, Any]:
+    if using_neo4j():
+        driver = auth_driver()
+        assert driver is not None
+        with driver.session(database=auth_database()) as session:
+            row = session.run(
+                """
+                MATCH (p:AuthProfile {user_id: $user_id})
+                RETURN p.zip_code AS zip_code,
+                       p.insurance_status AS insurance_status,
+                       p.insurance_provider AS insurance_provider,
+                       p.insurance_plan AS insurance_plan,
+                       p.member_id AS member_id,
+                       p.budget AS budget,
+                       p.language AS language,
+                       p.transport_mode AS transport_mode,
+                       p.care_need AS care_need,
+                       p.urgency AS urgency,
+                       p.household AS household
+                """,
+                user_id=int(user_id),
+            ).single()
+        return row.data() if row else default_profile()
+
     with connect() as conn:
         row = conn.execute(
             """
@@ -170,22 +356,40 @@ def get_profile(user_id: int) -> dict[str, Any]:
             """,
             (user_id,),
         ).fetchone()
-    return dict(row) if row else {
-        "zip_code": "",
-        "insurance_status": "uninsured",
-        "insurance_provider": "",
-        "insurance_plan": "",
-        "member_id": "",
-        "budget": 50,
-        "language": "English",
-        "transport_mode": "public_transit",
-        "care_need": "",
-        "urgency": "today",
-        "household": "",
-    }
+    return dict(row) if row else default_profile()
 
 
 def save_profile(user_id: int, profile: dict[str, Any]) -> dict[str, Any]:
+    if using_neo4j():
+        driver = auth_driver()
+        assert driver is not None
+        payload = default_profile()
+        payload.update(profile)
+        payload.pop("user_id", None)
+        with driver.session(database=auth_database()) as session:
+            session.run(
+                """
+                MERGE (p:AuthProfile {user_id: $user_id})
+                SET p.zip_code = $zip_code,
+                    p.insurance_status = $insurance_status,
+                    p.insurance_provider = $insurance_provider,
+                    p.insurance_plan = $insurance_plan,
+                    p.member_id = $member_id,
+                    p.budget = $budget,
+                    p.language = $language,
+                    p.transport_mode = $transport_mode,
+                    p.care_need = $care_need,
+                    p.urgency = $urgency,
+                    p.household = $household
+                WITH p
+                MATCH (u:AuthUser {id: $user_id})
+                MERGE (u)-[:HAS_PROFILE]->(p)
+                """,
+                user_id=int(user_id),
+                **payload,
+            )
+        return get_profile(user_id)
+
     with connect() as conn:
         conn.execute(
             """
@@ -230,6 +434,21 @@ def save_route_run(
     recommended_clinic: Optional[str],
     backup_clinic: Optional[str],
 ) -> int:
+    if using_neo4j():
+        driver = auth_driver()
+        assert driver is not None
+        with driver.session(database=auth_database()) as session:
+            record = session.execute_write(
+                _save_route_run_neo4j,
+                int(user_id),
+                payload_json,
+                result_json,
+                summary,
+                recommended_clinic,
+                backup_clinic,
+            )
+        return int(record["id"])
+
     with connect() as conn:
         cursor = conn.execute(
             """
@@ -241,7 +460,67 @@ def save_route_run(
         return int(cursor.lastrowid)
 
 
+def _save_route_run_neo4j(
+    tx,
+    user_id: int,
+    payload_json: str,
+    result_json: str,
+    summary: str,
+    recommended_clinic: Optional[str],
+    backup_clinic: Optional[str],
+) -> dict[str, Any]:
+    next_id = tx.run("MATCH (r:AuthRouteRun) RETURN coalesce(max(r.id), 0) + 1 AS next_id").single()["next_id"]
+    created_at = now_iso()
+    tx.run(
+        """
+        CREATE (r:AuthRouteRun {
+            id: $id,
+            user_id: $user_id,
+            summary: $summary,
+            recommended_clinic: $recommended_clinic,
+            backup_clinic: $backup_clinic,
+            payload_json: $payload_json,
+            result_json: $result_json,
+            created_at: $created_at
+        })
+        WITH r
+        MATCH (u:AuthUser {id: $user_id})
+        MERGE (u)-[:HAS_ROUTE_RUN]->(r)
+        """,
+        id=int(next_id),
+        user_id=user_id,
+        summary=summary,
+        recommended_clinic=recommended_clinic,
+        backup_clinic=backup_clinic,
+        payload_json=payload_json,
+        result_json=result_json,
+        created_at=created_at,
+    )
+    return {"id": int(next_id)}
+
+
 def list_route_runs(user_id: int, limit: int = 10) -> list[dict[str, Any]]:
+    if using_neo4j():
+        driver = auth_driver()
+        assert driver is not None
+        with driver.session(database=auth_database()) as session:
+            result = session.run(
+                """
+                MATCH (r:AuthRouteRun {user_id: $user_id})
+                RETURN r.id AS id,
+                       r.summary AS summary,
+                       r.recommended_clinic AS recommended_clinic,
+                       r.backup_clinic AS backup_clinic,
+                       r.payload_json AS payload_json,
+                       r.created_at AS created_at
+                ORDER BY r.created_at DESC, r.id DESC
+                LIMIT $limit
+                """,
+                user_id=int(user_id),
+                limit=int(limit),
+            )
+            return [record.data() for record in result]
+
     with connect() as conn:
         rows = conn.execute(
             """
