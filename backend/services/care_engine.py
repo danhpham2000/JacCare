@@ -38,6 +38,14 @@ CARE_KEYWORDS = {
 }
 
 ZIP_COORDS = {
+    "77002": (29.7569, -95.3625),
+    "77004": (29.7247, -95.3848),
+    "77005": (29.7174, -95.4287),
+    "77007": (29.7725, -95.4100),
+    "77008": (29.7992, -95.4180),
+    "77024": (29.7696, -95.5207),
+    "77030": (29.7048, -95.4018),
+    "77055": (29.7988, -95.4914),
     "78701": (30.2711, -97.7437),
     "78702": (30.2604, -97.7136),
     "78703": (30.2890, -97.7664),
@@ -49,6 +57,13 @@ ZIP_COORDS = {
     "78741": (30.2316, -97.7144),
     "78745": (30.2065, -97.7954),
     "78752": (30.3314, -97.7047),
+}
+
+ZIP_PREFIX_COORDS = {
+    "770": (29.7604, -95.3698),  # Houston
+    "752": (32.7767, -96.7970),  # Dallas
+    "782": (29.4241, -98.4936),  # San Antonio
+    "787": (30.2672, -97.7431),  # Austin
 }
 
 TRANSLATED_TERMS = {
@@ -234,8 +249,8 @@ def safety_check(payload: dict[str, Any]) -> dict[str, Any]:
 
 
 def distance_miles(zip_a: str, zip_b: str) -> float:
-    a = ZIP_COORDS.get(zip_a, ZIP_COORDS["78705"])
-    b = ZIP_COORDS.get(zip_b, ZIP_COORDS["78705"])
+    a = zip_anchor(zip_a)
+    b = zip_anchor(zip_b)
     lat1, lon1 = map(math.radians, a)
     lat2, lon2 = map(math.radians, b)
     dlat = lat2 - lat1
@@ -245,11 +260,21 @@ def distance_miles(zip_a: str, zip_b: str) -> float:
 
 
 def stable_coordinate(zip_code: str, identifier: str) -> tuple[float, float]:
-    base_lat, base_lon = ZIP_COORDS.get(zip_code, ZIP_COORDS["78705"])
+    base_lat, base_lon = zip_anchor(zip_code)
     spread = sum(ord(char) for char in identifier)
     lat_offset = ((spread % 11) - 5) * 0.0032
     lon_offset = (((spread // 11) % 11) - 5) * 0.0034
     return round(base_lat + lat_offset, 6), round(base_lon + lon_offset, 6)
+
+
+def zip_anchor(zip_code: str) -> tuple[float, float]:
+    normalized = str(zip_code or "").strip()
+    if normalized in ZIP_COORDS:
+        return ZIP_COORDS[normalized]
+    prefix = normalized[:3]
+    if prefix in ZIP_PREFIX_COORDS:
+        return ZIP_PREFIX_COORDS[prefix]
+    return ZIP_COORDS["78705"]
 
 
 def annotate_location(item: dict[str, Any], zip_code: Optional[str], identifier: Optional[str] = None) -> dict[str, Any]:

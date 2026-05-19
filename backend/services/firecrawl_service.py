@@ -10,8 +10,14 @@ FIRECRAWL_URL = "https://api.firecrawl.dev/v2/search"
 
 
 def city_hint(zip_code: str) -> str:
+    if zip_code.startswith("770"):
+        return "Houston, Texas"
     if zip_code.startswith("787"):
         return "Austin, Texas"
+    if zip_code.startswith("752"):
+        return "Dallas, Texas"
+    if zip_code.startswith("782"):
+        return "San Antonio, Texas"
     return "United States"
 
 
