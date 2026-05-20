@@ -271,7 +271,10 @@ def run_care_route(payload: IntakeRequest, user: dict[str, Any] = Depends(curren
 @app.get("/")
 def frontend_index() -> FileResponse:
     if FRONTEND_DIST.exists():
-        return FileResponse(FRONTEND_DIST / "index.html")
+        return FileResponse(
+            FRONTEND_DIST / "index.html",
+            headers={"Cache-Control": "no-store, no-cache, must-revalidate"},
+        )
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Frontend build not found")
 
 
@@ -280,5 +283,8 @@ def frontend_spa(full_path: str) -> FileResponse:
     if full_path.startswith("api") or full_path.startswith("docs") or full_path.startswith("openapi"):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
     if FRONTEND_DIST.exists():
-        return FileResponse(FRONTEND_DIST / "index.html")
+        return FileResponse(
+            FRONTEND_DIST / "index.html",
+            headers={"Cache-Control": "no-store, no-cache, must-revalidate"},
+        )
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Frontend build not found")
